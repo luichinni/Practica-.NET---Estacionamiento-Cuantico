@@ -9,14 +9,17 @@ while (!fin)
     eleccion = Console.ReadLine();
     ProcesarEleccion(eleccion);
 }
+// LISTAR VEHICULOS ---------------------------------------------------------------
 void ListarVehiculos()
 {
     foreach (Vehiculo vehiculo in ApertureParking.getListadoVehiculos())    
         Console.WriteLine(vehiculo.ToString());
 }
+// AGREGAR VEHICULO ---------------------------------------------------------------
 void AgregarVehiculo()
 {
     Vehiculo v = LeerVehiculo();
+    ApertureParking.Aparcar(v);
 }
 Vehiculo LeerVehiculo()
 {
@@ -40,6 +43,26 @@ Dueño LeerDueño()
     Console.WriteLine("Es vip? s/n");
     bool vip = Console.ReadLine().ToLower().Equals("s");
     return new Dueño(dni, nombre, vip);
+}
+// QUITAR VEHICULO POR MATRICULA --------------------------------------------------
+void QuitarVehiculoMatricula()
+{
+    Console.WriteLine("Ingrese la matricula del auto a desaparcar");
+    string matricula = Console.ReadLine();
+    ApertureParking.DesaparcarVehiculo(matricula);
+}
+// QUITAR VEHICULO POR DNI --------------------------------------------------------
+void QuitarVehiculoDni()
+{
+    Console.WriteLine("Ingrese DNI del titular cuyo vehiculo desea desaparcar (primer ocurrencia)");
+    int dni = int.Parse(Console.ReadLine());
+    ApertureParking.DesaparcarVehiculoDe(dni);
+}
+// QUITAR VEHICULOS RANDOM --------------------------------------------------------
+void QuitarVehiculosRandom()
+{
+    Random rnd = new Random();
+    int iteraciones = rnd.Next(ApertureParking.getListadoVehiculos().Count);
 }
 void ProcesarEleccion(int eleccion)
 {
