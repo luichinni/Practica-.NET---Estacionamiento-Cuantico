@@ -9,12 +9,19 @@ namespace EstacionamientoCuantico
     class Vehiculo
     {
         public Dueño Dueño { get; private set; }
-        public Tamaño Tamaño { get; private set; }
+        public string Modelo { get; private set; }
+        public string Matricula { get; private set; }
+        public double Largo { get; private set; }
+        public double Ancho { get; private set; }
 
-        public Vehiculo(Dueño dueño,double largo, double ancho)
+        public Vehiculo(Dueño dueño, string modelo, string matricula, double largo, double ancho)
         {
             this.Dueño = dueño;
-            this.Tamaño = Tamaños.getTamaño(largo, ancho);
+            this.Largo = largo;
+            this.Ancho = ancho;
+            this.Modelo = modelo;
+            this.Matricula = matricula;
         }
+        public Tamaño GetTamaño() => Tamaños.getTamaño(Largo, Ancho);
     }
 }

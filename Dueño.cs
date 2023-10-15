@@ -12,14 +12,19 @@ namespace EstacionamientoCuantico
         public string Nombre { get; private set; } = "Rattmann";
         private bool _vip = false;
 
-        public Dueño(int dni, string nombre) 
+        public Dueño(int dni, string nombre, bool vip = false) 
         {
             this.Dni = dni;
             this.Nombre = nombre;
+            this.setVip(vip);
         }
         public bool esVip() // para mayor legibilidad
         {
             return _vip;
+        }
+        public void setVip(bool vip)
+        {
+            _vip = vip;
         }
     }
 }

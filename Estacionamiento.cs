@@ -12,6 +12,7 @@ namespace EstacionamientoCuantico
         private Vehiculo[] zonaFinita;
         private bool[] plazasFinitasOcupadas;
         private List<int> plazasVip = new List<int>() { 3, 7, 12 };
+
         private List<Vehiculo> zonaCuantica;
         private List<Tamaño> tamañoZonaCuantica;
 
@@ -22,7 +23,7 @@ namespace EstacionamientoCuantico
             this.zonaCuantica = new List<Vehiculo>();
             this.tamañoZonaCuantica = new List<Tamaño>();
         }
-
+        public void 
         public void Estacionar(Vehiculo vehiculo)
         {
             bool pudoEstacionar = false;
@@ -34,7 +35,23 @@ namespace EstacionamientoCuantico
         }
         private void EstacionarEnZonaCuantica(Vehiculo vehiculo)
         {
+            // generar tamaño de estacionamiento que acepte el tamaño de vehiculo
+            Tamaño tamañoPlaza = getTamañoPlaza(vehiculo.GetTamaño());
+            this.zonaCuantica.Add(vehiculo);
+            this.tamañoZonaCuantica.Add(tamañoPlaza);
+        }
+        private Tamaño getTamañoPlaza(Tamaño tamañoVehiculo)
+        { 
+            //#nullable disable
+            Random rand = new Random();
+            Array tipos = Enum.GetValues(typeof(Tamaño));
+            Tamaño tamañoRet = (Tamaño)tipos.GetValue(rand.Next(tipos.Length));
 
+            while (tamañoRet < tamañoVehiculo) // genera un tamaño que permita el vehiculo aunq no sea el que mejor se adapta
+                tamañoRet = (Tamaño)tipos.GetValue(rand.Next(tipos.Length));
+
+            return tamañoRet;
+            //#nullable enable
         }
         private bool HayPlazasFinitasDisponibles() => plazasFinitasOcupadas.Contains(false);
         private bool EstacionarEnZonaFinita(Vehiculo vehiculo)
