@@ -23,5 +23,9 @@ namespace EstacionamientoCuantico
             this.Matricula = matricula;
         }
         public Tamaño GetTamaño() => Tamaños.getTamaño(Largo, Ancho);
+        public override string ToString()
+        {
+            return $"Dueño: {this.Dueño.Nombre}\t Matricula: {this.Matricula} \t Tamaño: {this.GetTamaño()}";
+        }
     }
 }
