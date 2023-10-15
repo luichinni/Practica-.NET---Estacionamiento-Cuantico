@@ -23,6 +23,17 @@ namespace EstacionamientoCuantico
             this.zonaCuantica = new List<Vehiculo>();
             this.tamañoZonaCuantica = new List<Tamaño>();
         }
+        public List<Vehiculo> getListadoVehiculos()
+        {
+            List<Vehiculo> vehiculos = new List<Vehiculo> ();
+
+            foreach (Vehiculo v in zonaFinita)
+                vehiculos.Add (v);
+            foreach (Vehiculo v in zonaCuantica)
+                vehiculos.Add (v);
+
+            return vehiculos;
+        }
         // DESAPARCAR DE POR DNI ---------------------------------------------
         public void DesaparcarVehiculoDe(string dniDueño)
         {
