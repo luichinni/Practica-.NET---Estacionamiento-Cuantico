@@ -11,7 +11,7 @@ namespace EstacionamientoCuantico
         private int tamañoZonaFinita = 12;
         private Vehiculo[] zonaFinita;
         private bool[] plazasFinitasOcupadas;
-        private List<int> plazasVip = new List<int>() { 3, 7, 12 };
+        private List<int> plazasVip = new List<int>() { 3, 7, 12 }; // de esta manera podemos tener más vip
 
         private List<Vehiculo> zonaCuantica;
         private List<Tamaño> tamañoZonaCuantica;
@@ -23,8 +23,84 @@ namespace EstacionamientoCuantico
             this.zonaCuantica = new List<Vehiculo>();
             this.tamañoZonaCuantica = new List<Tamaño>();
         }
-        public void 
-        public void Estacionar(Vehiculo vehiculo)
+        // DESAPARCAR DE POR DNI ---------------------------------------------
+        public void DesaparcarVehiculoDe(string dniDueño)
+        {
+            bool pudoDesaparcar = DesaparcarDeZonaFinitaDni(dniDueño); // si no existe no puede desaparcar
+            if (!pudoDesaparcar)
+            {
+                DesaparcarDeZonaCuanticaDni(dniDueño);
+            }
+        }
+        private void DesaparcarDeZonaCuanticaDni(string dniDueño)
+        {
+            int indice = 0;
+            while (indice < zonaCuantica.Count)
+            {
+                if (zonaCuantica[indice].Dueño.Dni.Equals(dniDueño))
+                {
+                    tamañoZonaCuantica.RemoveAt(indice); // en zona cuantica no necesito conservar nada
+                    zonaCuantica.RemoveAt(indice);
+                }
+                indice++;
+            }
+        }
+        private bool DesaparcarDeZonaFinitaDni(string dniDueño)
+        {
+            bool pudo = false;
+            int indice = 0;
+            while (!pudo && indice < zonaFinita.Length)
+            {
+                if (zonaFinita[indice].Dueño.Dni.Equals(dniDueño))
+                {
+                    plazasFinitasOcupadas[indice] = false;
+                    zonaFinita[indice] = null;
+                    pudo = true;
+                }
+                indice++;
+            }
+            return pudo;
+        }
+        // DESAPARCAR POR MATRICULA -----------------------------------------------
+        public void DesaparcarVehiculo(string matricula)
+        {
+            bool pudoDesaparcar = DesaparcarDeZonaFinita(matricula); // si no existe no puede desaparcar
+            if (!pudoDesaparcar)
+            {
+                DesaparcarDeZonaCuantica(matricula);
+            }
+        }
+        private void DesaparcarDeZonaCuantica(string matricula) 
+        {
+            int indice = 0;
+            while (indice < zonaCuantica.Count)
+            {
+                if (zonaCuantica[indice].Matricula.Equals(matricula))
+                {
+                    tamañoZonaCuantica.RemoveAt(indice); // en zona cuantica no necesito conservar nada
+                    zonaCuantica.RemoveAt(indice);
+                }
+                indice++;
+            }
+        }
+        private bool DesaparcarDeZonaFinita(string matricula)
+        {
+            bool pudo = false;
+            int indice = 0;
+            while (!pudo && indice < zonaFinita.Length)
+            {
+                if (zonaFinita[indice].Matricula.Equals(matricula))
+                {
+                    plazasFinitasOcupadas[indice] = false;
+                    zonaFinita[indice] = null;
+                    pudo = true;
+                }
+                indice++;
+            }
+            return pudo;
+        }
+        // APARCAR VEHICULOS ------------------------------------------------
+        public void Aparcar(Vehiculo vehiculo)
         {
             bool pudoEstacionar = false;
             if (HayPlazasFinitasDisponibles())
