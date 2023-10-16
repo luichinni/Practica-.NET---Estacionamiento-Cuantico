@@ -11,7 +11,7 @@ namespace EstacionamientoCuantico
         public Estacionamiento ApertureParking { get; set; }
         public Menu(Estacionamiento estacionamiento) 
         {
-            ApertureParking = estacionamiento;
+            this.ApertureParking = estacionamiento;
         }
         public bool ProcesarEleccion(string eleccion)
         {
@@ -59,8 +59,7 @@ namespace EstacionamientoCuantico
         // LISTAR VEHICULOS ---------------------------------------------------------------
         private void ListarVehiculos()
         {
-            foreach (Vehiculo vehiculo in ApertureParking.getListadoVehiculos())
-                Console.WriteLine(vehiculo.ToString());
+            Console.WriteLine(ApertureParking.ToString());
         }
         // AGREGAR VEHICULO ---------------------------------------------------------------
         private void AgregarVehiculo()

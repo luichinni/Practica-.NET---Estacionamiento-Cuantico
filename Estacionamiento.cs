@@ -28,11 +28,33 @@ namespace EstacionamientoCuantico
             List<Vehiculo> vehiculos = new List<Vehiculo> ();
 
             foreach (Vehiculo v in zonaFinita)
-                vehiculos.Add (v);
+            {
+                if(v != null)
+                    vehiculos.Add(v);
+            }
             foreach (Vehiculo v in zonaCuantica)
-                vehiculos.Add (v);
+            {
+                vehiculos.Add(v);
+                Console.WriteLine(v.ToString());
+            }
 
             return vehiculos;
+        }
+        public override string ToString()
+        {
+            string strRet = "";
+            strRet += "Estacionamiento finito: \n";
+            for (int i = 0; i < zonaFinita.Length; i++)
+            {
+                if (zonaFinita[i] != null)
+                    strRet += $"Auto en pos {i}: " + zonaFinita[i].ToString()+"\n";
+            }
+            strRet += "Estacionamiento cuantico:\n";
+            for (int i = 0; i < zonaCuantica.Count; i++)
+            {
+                strRet += $"Tamaño espacio: {tamañoZonaCuantica[i]}, vehiculo: " + zonaCuantica[i].ToString()+"\n";
+            }
+            return strRet;
         }
         // OPTIMIZAR ESPACIO (quizas) ------------------------------------------------
         public void OptimizarEspacio()
@@ -129,7 +151,7 @@ namespace EstacionamientoCuantico
             int indice = 0;
             while (!pudo && indice < zonaFinita.Length)
             {
-                if (zonaFinita[indice].Matricula.Equals(matricula))
+                if (zonaFinita[indice] != null && zonaFinita[indice].Matricula.Equals(matricula))
                 {
                     plazasFinitasOcupadas[indice] = false;
                     zonaFinita[indice] = null;
@@ -145,7 +167,7 @@ namespace EstacionamientoCuantico
             bool pudoEstacionar = false;
             if (HayPlazasFinitasDisponibles())
                 pudoEstacionar = EstacionarEnZonaFinita(vehiculo); // retorna bool si puede o no
-            
+
             if (!pudoEstacionar)
                 EstacionarEnZonaCuantica(vehiculo);
         }
@@ -173,18 +195,16 @@ namespace EstacionamientoCuantico
         private bool EstacionarEnZonaFinita(Vehiculo vehiculo)
         {
             bool pudoEstacionar = false;
-            
             if (vehiculo.Dueño.esVip()) // si el dueño es vip y hay plaza vip disponible
             {
                 int vipDisponible = getVipDisponible();
                 if (vipDisponible != -1)
                 {
-                    this.plazasFinitasOcupadas[vipDisponible] = true;
-                    this.zonaFinita[vipDisponible] = vehiculo;
+                    this.plazasFinitasOcupadas[vipDisponible-1] = true;
+                    this.zonaFinita[vipDisponible-1] = vehiculo;
                     pudoEstacionar = true;
                 }
             }
-
             if (!pudoEstacionar) // si el vip no pudo estacionar o si no era vip entra aca
             {
                 int sigDisponible = getSiguienteDisponible();
@@ -195,7 +215,6 @@ namespace EstacionamientoCuantico
                     pudoEstacionar = true;
                 }
             }
-
             return pudoEstacionar;
         }
         private int getSiguienteDisponible()
@@ -206,6 +225,7 @@ namespace EstacionamientoCuantico
             {
                 if (!plazasVip.Contains(indice) && !plazasFinitasOcupadas[indice])// si no es vip y no está ocupada
                     plazaDisponible = indice;
+                indice++;
             }
             return plazaDisponible;
         }
@@ -215,7 +235,7 @@ namespace EstacionamientoCuantico
             int indice = 0;
             while (plazaDisponible == -1 && indice < plazasVip.Count) // mientras no haya una plaza disponible y hayan plazas por ver
             {
-                if (!plazasFinitasOcupadas[ plazasVip[indice] ]) // si la plaza finita vip no está ocupada
+                if (!plazasFinitasOcupadas[ plazasVip[indice]-1 ]) // si la plaza finita vip no está ocupada
                     plazaDisponible = plazasVip[indice]; // la guarda para ocupar
 
                 indice++;
