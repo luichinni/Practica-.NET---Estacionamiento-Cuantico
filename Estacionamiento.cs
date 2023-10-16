@@ -35,7 +35,6 @@ namespace EstacionamientoCuantico
             foreach (Vehiculo v in zonaCuantica)
             {
                 vehiculos.Add(v);
-                Console.WriteLine(v.ToString());
             }
 
             return vehiculos;
@@ -47,7 +46,7 @@ namespace EstacionamientoCuantico
             for (int i = 0; i < zonaFinita.Length; i++)
             {
                 if (zonaFinita[i] != null)
-                    strRet += $"Auto en pos {i}: " + zonaFinita[i].ToString()+"\n";
+                    strRet += $"Auto en plaza {i+1}: " + zonaFinita[i].ToString()+"\n";
             }
             strRet += "Estacionamiento cuantico:\n";
             for (int i = 0; i < zonaCuantica.Count; i++)
@@ -113,7 +112,7 @@ namespace EstacionamientoCuantico
             int indice = 0;
             while (!pudo && indice < zonaFinita.Length)
             {
-                if (zonaFinita[indice].Dueño.Dni.Equals(dniDueño))
+                if (zonaFinita[indice]!=null && zonaFinita[indice].Dueño.Dni.Equals(dniDueño))
                 {
                     plazasFinitasOcupadas[indice] = false;
                     zonaFinita[indice] = null;
