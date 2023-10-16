@@ -42,16 +42,18 @@ namespace EstacionamientoCuantico
         public override string ToString()
         {
             string strRet = "";
-            strRet += "Estacionamiento finito: \n";
+            strRet += "Estacionamiento finito: \nPlaza Nro\t\tInfo Vehiculo\n";
             for (int i = 0; i < zonaFinita.Length; i++)
             {
                 if (zonaFinita[i] != null)
-                    strRet += $"Auto en plaza {i+1}: " + zonaFinita[i].ToString()+"\n";
+                    strRet += $"{i+1}:\t\t" + zonaFinita[i].ToString()+"\n";
             }
-            strRet += "Estacionamiento cuantico:\n";
+            strRet += "Estacionamiento cuantico:\nTamaño Plaza\t\tInfo Vehiculo\n";
+            string tabulacion = "";
             for (int i = 0; i < zonaCuantica.Count; i++)
             {
-                strRet += $"Tamaño espacio: {tamañoZonaCuantica[i]}, vehiculo: " + zonaCuantica[i].ToString()+"\n";
+                tabulacion = tamañoZonaCuantica[i] == Tamaño.Standard ? "\t" : "\t\t";
+                strRet += $"{tamañoZonaCuantica[i]}"+ tabulacion + zonaCuantica[i].ToString()+"\n";
             }
             return strRet;
         }

@@ -25,7 +25,7 @@ namespace EstacionamientoCuantico
         public Tamaño GetTamaño() => Tamaños.getTamaño(Largo, Ancho);
         public override string ToString()
         {
-            return $"Dueño: {this.Dueño.Nombre}\tDni: {this.Dueño.Dni} \t Vip: {this.Dueño.esVip()}\t Matricula: {this.Matricula} \t Tamaño: {this.GetTamaño()}";
+            return $"{this.Dueño.ToString()}\t Matricula: {this.Matricula} \t Tamaño: {this.GetTamaño()}";
         }
     }
 }
