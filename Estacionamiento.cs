@@ -34,8 +34,37 @@ namespace EstacionamientoCuantico
 
             return vehiculos;
         }
+        // OPTIMIZAR ESPACIO (quizas) ------------------------------------------------
+        public void OptimizarEspacio()
+        {
+            int cantTipos = Enum.GetValues(typeof(Tamaño)).Length; // cantidad de tipos
+            List<Vehiculo>[] vehiculos = new List<Vehiculo>[cantTipos]; // array de listas por tipo
+            for (int i=0; i<cantTipos; i++) vehiculos[i] = new List<Vehiculo> (); // inicializamos las listas
+
+            foreach(Vehiculo ve in zonaCuantica)
+                vehiculos[(int)ve.GetTamaño()].Add(ve); // separamos por tipo los vehiculos
+
+            int[] dimLogicaLista = new int[cantTipos]; // dimension logica de la lista para tener el indice del ultimo seleccionado
+            int tipoPlaza;
+
+            for(int i = 0; i < zonaCuantica.Count; i++)
+            {
+                tipoPlaza = (int)tamañoZonaCuantica[i];
+                zonaCuantica[i] = getSiguiente(vehiculos, tipoPlaza, dimLogicaLista);
+            }
+        }
+        private Vehiculo getSiguiente(List<Vehiculo>[] vehiculos, int tamaño, int[] contadorLista)
+        {
+            // si dimL es menor a la cantidad de un tipo
+            //      buscar el siguiente de ese tipo
+            // sino si dimL es mayor igual a la cantidad de un tipo
+            //      busca el siguiente del tamaño anterior
+            while (contadorLista[tamaño] >= vehiculos[tamaño].Count) tamaño--;
+            contadorLista[tamaño]++;
+            return vehiculos[tamaño][contadorLista[tamaño]-1];
+        }
         // DESAPARCAR DE POR DNI ---------------------------------------------
-        public void DesaparcarVehiculoDe(int dniDueño)
+        public void DesaparcarVehiculoDe(string dniDueño)
         {
             bool pudoDesaparcar = DesaparcarDeZonaFinitaDni(dniDueño); // si no existe no puede desaparcar
             if (!pudoDesaparcar)
@@ -43,7 +72,7 @@ namespace EstacionamientoCuantico
                 DesaparcarDeZonaCuanticaDni(dniDueño);
             }
         }
-        private void DesaparcarDeZonaCuanticaDni(int dniDueño)
+        private void DesaparcarDeZonaCuanticaDni(string dniDueño)
         {
             int indice = 0;
             while (indice < zonaCuantica.Count)
@@ -56,7 +85,7 @@ namespace EstacionamientoCuantico
                 indice++;
             }
         }
-        private bool DesaparcarDeZonaFinitaDni(int dniDueño)
+        private bool DesaparcarDeZonaFinitaDni(string dniDueño)
         {
             bool pudo = false;
             int indice = 0;
