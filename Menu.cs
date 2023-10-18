@@ -67,27 +67,51 @@ namespace EstacionamientoCuantico
             Vehiculo v = LeerVehiculo();
             ApertureParking.Aparcar(v);
         }
-        private Vehiculo LeerVehiculo()
+        private Vehiculo LeerVehiculo() // comprobacion de datos
         {
             Dueño dueño = LeerDueño();
+
             Console.WriteLine("Ingrese Modelo");
             string modelo = Console.ReadLine();
+
             Console.WriteLine("Ingrese Matricula");
             string matricula = Console.ReadLine();
+
             Console.WriteLine("Ingrese el largo");
-            double largo = double.Parse(Console.ReadLine().Replace(',', '.'));
+            string largo = "";
+            //double largo = double.Parse(Console.ReadLine().Replace(',', '.'));
+            while (!EsNumerico(largo.Remove(largo.IndexOf('.'))))
+            {
+                largo = Console.ReadLine().Replace(',', '.');
+            }
+            double largoNum = double.Parse(largo);
+
             Console.WriteLine("Ingrese el ancho");
-            double ancho = double.Parse(Console.ReadLine().Replace(',', '.'));
-            return new Vehiculo(dueño, modelo, matricula, largo, ancho);
+            string ancho = "";
+            //double largo = double.Parse(Console.ReadLine().Replace(',', '.'));
+            while (!EsNumerico(ancho.Remove(ancho.IndexOf('.'))))
+            {
+                ancho = Console.ReadLine().Replace(',', '.');
+            }
+            double anchoNum = double.Parse(ancho);
+
+            return new Vehiculo(dueño, modelo, matricula, largoNum, anchoNum);
         }
         private Dueño LeerDueño()
         {
+            string dni = "";
             Console.WriteLine("Ingrese el DNI");
-            string dni = Console.ReadLine();
+            while (!EsNumerico(dni))
+            {
+                dni = Console.ReadLine();
+            }
+
             Console.WriteLine("Ingrese el Nombre");
             string nombre = Console.ReadLine();
+
             Console.WriteLine("Es vip? s/n");
             bool vip = Console.ReadLine().ToLower().Equals("s");
+
             return new Dueño(dni, nombre, vip);
         }
         // QUITAR VEHICULO POR MATRICULA --------------------------------------------------
@@ -95,7 +119,15 @@ namespace EstacionamientoCuantico
         {
             Console.WriteLine("Ingrese la matricula del auto a desaparcar");
             string matricula = Console.ReadLine();
-            ApertureParking.DesaparcarVehiculo(matricula);
+            bool pudoDesaparcar = ApertureParking.IntentarDesaparcarVehiculo(matricula);
+            if (pudoDesaparcar)
+            {
+                Console.WriteLine($"Vehiculo de matricula {matricula} desaparcado con exito");
+            }
+            else
+            {
+                Console.WriteLine($"No existe un vehiculo de matricula {matricula}");
+            }
         }
         // QUITAR VEHICULO POR DNI --------------------------------------------------------
         private void QuitarVehiculoDni()
@@ -120,12 +152,12 @@ namespace EstacionamientoCuantico
                     seleccion = Console.ReadLine(); // mientras la rta no sea numerica sigue pidiendo valores
                 }
                 int selec = int.Parse(seleccion); // parsea
-                if (selec >= 0 && selec < indice) ApertureParking.DesaparcarVehiculo(listaV[selec].Matricula); // si la seleccion esta en el rango de vehiculos, lo elimina
+                if (selec >= 0 && selec < indice) ApertureParking.IntentarDesaparcarVehiculo(listaV[selec].Matricula); // si la seleccion esta en el rango de vehiculos, lo elimina
                 else// sino, elimina todos
                 {
                     foreach(Vehiculo vo in listaV)
                     {
-                        ApertureParking.DesaparcarVehiculo(vo.Matricula);
+                        ApertureParking.IntentarDesaparcarVehiculo(vo.Matricula);
                     }
                 }
             }
@@ -137,14 +169,12 @@ namespace EstacionamientoCuantico
         }
         private bool EsNumerico(string str)
         {
-            bool es = false;
-            int indice = 0;
-            while (indice < str.Length)
+            int cantNumeros=0;
+            foreach(char c in str)
             {
-                if (str[indice] >= '0' && str[indice] <= '9') es = true;
-                indice++;
+                if (c >= '0' && c <= '9') cantNumeros++;
             }
-            return es;
+            return cantNumeros == (str.Length-1);
         }
         // QUITAR VEHICULOS RANDOM --------------------------------------------------------
         private void QuitarVehiculosRandom()
@@ -156,7 +186,7 @@ namespace EstacionamientoCuantico
             for (int i = 0; i < iteraciones; i++)
             {
                 vAux = listaVehiculos[rnd.Next(listaVehiculos.Count)];
-                ApertureParking.DesaparcarVehiculo(vAux.Matricula);
+                ApertureParking.IntentarDesaparcarVehiculo(vAux.Matricula);
                 listaVehiculos.Remove(vAux);
             }
         }

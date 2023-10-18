@@ -145,27 +145,31 @@ namespace EstacionamientoCuantico
             return pudo;
         }*/
         // DESAPARCAR POR MATRICULA -----------------------------------------------
-        public void DesaparcarVehiculo(string matricula)
+        public bool IntentarDesaparcarVehiculo(string matricula)
         {
-            bool pudoDesaparcar = DesaparcarDeZonaFinita(matricula); // si no existe no puede desaparcar
+            bool pudoDesaparcar = IntentarDesaparcarDeZonaFinita(matricula); // si no existe no puede desaparcar
             if (!pudoDesaparcar)
             {
-                DesaparcarDeZonaCuantica(matricula);
+                pudoDesaparcar = IntentarDesaparcarDeZonaCuantica(matricula);
             }
+            return pudoDesaparcar;
         }
-        private void DesaparcarDeZonaCuantica(string matricula) 
+        private bool IntentarDesaparcarDeZonaCuantica(string matricula)
         {
             int indice = 0;
+            bool pudo = false;
             while (indice < zonaCuantica.Count)
             {
                 if (zonaCuantica[indice].VehiculoEstacionado.Matricula.Equals(matricula))
                 {
                     zonaCuantica.RemoveAt(indice);// en zona cuantica no necesito conservar nada
+                    pudo = true;
                 }
                 indice++;
             }
+            return pudo;
         }
-        private bool DesaparcarDeZonaFinita(string matricula)
+        private bool IntentarDesaparcarDeZonaFinita(string matricula)
         {
             bool pudo = false;
             int indice = 0;
@@ -183,11 +187,11 @@ namespace EstacionamientoCuantico
         // APARCAR VEHICULOS ------------------------------------------------
         public void Aparcar(Vehiculo vehiculo)
         {
-            bool pudoEstacionar = false;
+            bool pudoEstacionarZonaFinita = false;
             if (HayPlazasFinitasDisponibles())
-                pudoEstacionar = EstacionarEnZonaFinita(vehiculo); // retorna bool si puede o no
+                pudoEstacionarZonaFinita = IntentarEstacionarEnZonaFinita(vehiculo); // retorna bool si puede o no
 
-            if (!pudoEstacionar)
+            if (!pudoEstacionarZonaFinita)
                 EstacionarEnZonaCuantica(vehiculo);
         }
         private void EstacionarEnZonaCuantica(Vehiculo vehiculo)
@@ -223,7 +227,7 @@ namespace EstacionamientoCuantico
             }
             return hayDisponible;
         }
-        private bool EstacionarEnZonaFinita(Vehiculo vehiculo)
+        private bool IntentarEstacionarEnZonaFinita(Vehiculo vehiculo)
         {
             bool pudoEstacionar = false;
             if (vehiculo.Dueño.esVip()) // si el dueño es vip y hay plaza vip disponible
