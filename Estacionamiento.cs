@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,33 +9,54 @@ namespace EstacionamientoCuantico
 {
     class Estacionamiento
     {
-        private int tamañoZonaFinita = 12;
-        private Vehiculo[] zonaFinita;
-        private bool[] plazasFinitasOcupadas;
-        private List<int> plazasVip = new List<int>() { 3, 7, 12 }; // de esta manera podemos tener más vip
+        private PlazaEstacionamientoFinita[] zonaFinita;
+        private int[] plazasVip;
+        private List<PlazaEstacionamientoCuantico> zonaCuantica;
 
-        private List<Vehiculo> zonaCuantica;
-        private List<Tamaño> tamañoZonaCuantica;
-
-        public Estacionamiento() 
+        public Estacionamiento(int tamañoZonaFinita, int[] plazasVip) 
         {
-            this.zonaFinita = new Vehiculo[tamañoZonaFinita];
-            this.plazasFinitasOcupadas = new bool[tamañoZonaFinita];
-            this.zonaCuantica = new List<Vehiculo>();
-            this.tamañoZonaCuantica = new List<Tamaño>();
+            this.plazasVip = plazasVip;
+            this.zonaFinita = IniciarZonaFinita(tamañoZonaFinita);
+            this.zonaCuantica = new List<PlazaEstacionamientoCuantico>();
+        }
+        private PlazaEstacionamientoFinita[] IniciarZonaFinita(int tamaño)
+        {
+            PlazaEstacionamientoFinita[] nuevaZona = new PlazaEstacionamientoFinita[tamaño];
+            for(int i=0; i < nuevaZona.Length; i++)
+            {
+                nuevaZona[i] = new PlazaEstacionamientoFinita(null, plazasVip.Contains(i));
+            }
+            return nuevaZona;
         }
         public List<Vehiculo> getListadoVehiculos()
         {
             List<Vehiculo> vehiculos = new List<Vehiculo> ();
 
-            foreach (Vehiculo v in zonaFinita)
+            foreach (PlazaEstacionamientoFinita plazaEstacionamiento in zonaFinita)
             {
-                if(v != null)
-                    vehiculos.Add(v);
+                if(plazaEstacionamiento.estaOcupada())
+                    vehiculos.Add(plazaEstacionamiento.VehiculoEstacionado);
             }
-            foreach (Vehiculo v in zonaCuantica)
+            foreach (PlazaEstacionamientoCuantico plazaEstacionamiento in zonaCuantica)
             {
-                vehiculos.Add(v);
+                vehiculos.Add(plazaEstacionamiento.VehiculoEstacionado);
+            }
+
+            return vehiculos;
+        }
+        public List<Vehiculo> getListadoVehiculosDe(string dni)
+        {
+            List<Vehiculo> vehiculos = new List<Vehiculo>();
+
+            foreach (PlazaEstacionamientoFinita plazaEstacionamiento in zonaFinita)
+            {
+                if (plazaEstacionamiento.estaOcupada() && plazaEstacionamiento.VehiculoEstacionado.Dueño.Dni.Equals(dni))
+                    vehiculos.Add(plazaEstacionamiento.VehiculoEstacionado);
+            }
+            foreach (PlazaEstacionamientoCuantico plazaEstacionamiento in zonaCuantica)
+            {
+                if (plazaEstacionamiento.VehiculoEstacionado.Dueño.Dni.Equals(dni))
+                    vehiculos.Add(plazaEstacionamiento.VehiculoEstacionado);
             }
 
             return vehiculos;
@@ -45,15 +67,15 @@ namespace EstacionamientoCuantico
             strRet += "Estacionamiento finito: \nPlaza Nro\t\tInfo Vehiculo\n";
             for (int i = 0; i < zonaFinita.Length; i++)
             {
-                if (zonaFinita[i] != null)
-                    strRet += $"{i+1}:\t\t" + zonaFinita[i].ToString()+"\n";
+                if (zonaFinita[i].estaOcupada())
+                    strRet += $"{i+1}:\t\t" + zonaFinita[i].VehiculoEstacionado.ToString()+"\n";
             }
             strRet += "Estacionamiento cuantico:\nTamaño Plaza\t\tInfo Vehiculo\n";
             string tabulacion = "";
             for (int i = 0; i < zonaCuantica.Count; i++)
             {
-                tabulacion = tamañoZonaCuantica[i] == Tamaño.Standard ? "\t" : "\t\t";
-                strRet += $"{tamañoZonaCuantica[i]}"+ tabulacion + zonaCuantica[i].ToString()+"\n";
+                tabulacion = zonaCuantica[i].TamañoPlaza == Tamaño.Standard ? "\t" : "\t\t";
+                strRet += $"{zonaCuantica[i].TamañoPlaza}"+ tabulacion + zonaCuantica[i].VehiculoEstacionado.ToString()+"\n";
             }
             return strRet;
         }
@@ -64,16 +86,16 @@ namespace EstacionamientoCuantico
             List<Vehiculo>[] vehiculos = new List<Vehiculo>[cantTipos]; // array de listas por tipo
             for (int i=0; i<cantTipos; i++) vehiculos[i] = new List<Vehiculo> (); // inicializamos las listas
 
-            foreach(Vehiculo ve in zonaCuantica)
-                vehiculos[(int)ve.GetTamaño()].Add(ve); // separamos por tipo los vehiculos
+            foreach(PlazaEstacionamientoCuantico plaza in zonaCuantica)
+                vehiculos[(int)plaza.VehiculoEstacionado.GetTamaño()].Add(plaza.VehiculoEstacionado); // separamos por tipo los vehiculos
 
-            int[] dimLogicaLista = new int[cantTipos]; // dimension logica de la lista para tener el indice del ultimo seleccionado
+            int[] dimLogicaLista = new int[cantTipos]; // arreglo contador de cantidad de autos usados por lista
             int tipoPlaza;
 
             for(int i = 0; i < zonaCuantica.Count; i++)
             {
-                tipoPlaza = (int)tamañoZonaCuantica[i];
-                zonaCuantica[i] = getSiguiente(vehiculos, tipoPlaza, dimLogicaLista);
+                tipoPlaza = (int)zonaCuantica[i].TamañoPlaza;
+                zonaCuantica[i].VehiculoEstacionado = getSiguiente(vehiculos, tipoPlaza, dimLogicaLista);
             }
         }
         private Vehiculo getSiguiente(List<Vehiculo>[] vehiculos, int tamaño, int[] contadorLista)
@@ -83,11 +105,11 @@ namespace EstacionamientoCuantico
             // sino si dimL es mayor igual a la cantidad de un tipo
             //      busca el siguiente del tamaño anterior
             while (contadorLista[tamaño] >= vehiculos[tamaño].Count) tamaño--;
-            contadorLista[tamaño]++;
+            contadorLista[tamaño]++; // aumento del contador de autos usados del arreglo contador
             return vehiculos[tamaño][contadorLista[tamaño]-1];
         }
         // DESAPARCAR DE POR DNI ---------------------------------------------
-        public void DesaparcarVehiculoDe(string dniDueño)
+        /*public void DesaparcarVehiculoDe(string dniDueño)
         {
             bool pudoDesaparcar = DesaparcarDeZonaFinitaDni(dniDueño); // si no existe no puede desaparcar
             if (!pudoDesaparcar)
@@ -100,10 +122,9 @@ namespace EstacionamientoCuantico
             int indice = 0;
             while (indice < zonaCuantica.Count)
             {
-                if (zonaCuantica[indice].Dueño.Dni.Equals(dniDueño))
+                if (zonaCuantica[indice].VehiculoEstacionado.Dueño.Dni.Equals(dniDueño))
                 {
-                    tamañoZonaCuantica.RemoveAt(indice); // en zona cuantica no necesito conservar nada
-                    zonaCuantica.RemoveAt(indice);
+                    zonaCuantica.RemoveAt(indice); // en zona cuantica no necesito conservar nada
                 }
                 indice++;
             }
@@ -114,16 +135,15 @@ namespace EstacionamientoCuantico
             int indice = 0;
             while (!pudo && indice < zonaFinita.Length)
             {
-                if (zonaFinita[indice]!=null && zonaFinita[indice].Dueño.Dni.Equals(dniDueño))
+                if (zonaFinita[indice].estaOcupada() && zonaFinita[indice].VehiculoEstacionado.Dueño.Dni.Equals(dniDueño))
                 {
-                    plazasFinitasOcupadas[indice] = false;
-                    zonaFinita[indice] = null;
+                    zonaFinita[indice].VehiculoEstacionado = null;
                     pudo = true;
                 }
                 indice++;
             }
             return pudo;
-        }
+        }*/
         // DESAPARCAR POR MATRICULA -----------------------------------------------
         public void DesaparcarVehiculo(string matricula)
         {
@@ -138,10 +158,9 @@ namespace EstacionamientoCuantico
             int indice = 0;
             while (indice < zonaCuantica.Count)
             {
-                if (zonaCuantica[indice].Matricula.Equals(matricula))
+                if (zonaCuantica[indice].VehiculoEstacionado.Matricula.Equals(matricula))
                 {
-                    tamañoZonaCuantica.RemoveAt(indice); // en zona cuantica no necesito conservar nada
-                    zonaCuantica.RemoveAt(indice);
+                    zonaCuantica.RemoveAt(indice);// en zona cuantica no necesito conservar nada
                 }
                 indice++;
             }
@@ -152,10 +171,9 @@ namespace EstacionamientoCuantico
             int indice = 0;
             while (!pudo && indice < zonaFinita.Length)
             {
-                if (zonaFinita[indice] != null && zonaFinita[indice].Matricula.Equals(matricula))
+                if (zonaFinita[indice].estaOcupada() && zonaFinita[indice].VehiculoEstacionado.Matricula.Equals(matricula))
                 {
-                    plazasFinitasOcupadas[indice] = false;
-                    zonaFinita[indice] = null;
+                    zonaFinita[indice].VehiculoEstacionado = null;
                     pudo = true;
                 }
                 indice++;
@@ -175,9 +193,8 @@ namespace EstacionamientoCuantico
         private void EstacionarEnZonaCuantica(Vehiculo vehiculo)
         {
             // generar tamaño de estacionamiento que acepte el tamaño de vehiculo
-            Tamaño tamañoPlaza = getTamañoPlaza(vehiculo.GetTamaño());
-            this.zonaCuantica.Add(vehiculo);
-            this.tamañoZonaCuantica.Add(tamañoPlaza);
+            PlazaEstacionamientoCuantico plazaEstCuantic = new PlazaEstacionamientoCuantico(vehiculo, getTamañoPlaza(vehiculo.GetTamaño()));
+            this.zonaCuantica.Add(plazaEstCuantic);
         }
         private Tamaño getTamañoPlaza(Tamaño tamañoVehiculo)
         { 
@@ -192,7 +209,20 @@ namespace EstacionamientoCuantico
             return tamañoRet;
             //#nullable enable
         }
-        private bool HayPlazasFinitasDisponibles() => plazasFinitasOcupadas.Contains(false);
+        private bool HayPlazasFinitasDisponibles() 
+        {
+            bool hayDisponible = false;
+            int indice = 0;
+            while (!hayDisponible && indice < zonaFinita.Length)
+            {
+                if (!zonaFinita[indice].estaOcupada())
+                {
+                    hayDisponible = true;
+                }
+                indice++;
+            }
+            return hayDisponible;
+        }
         private bool EstacionarEnZonaFinita(Vehiculo vehiculo)
         {
             bool pudoEstacionar = false;
@@ -201,8 +231,7 @@ namespace EstacionamientoCuantico
                 int vipDisponible = getVipDisponible();
                 if (vipDisponible != -1)
                 {
-                    this.plazasFinitasOcupadas[vipDisponible-1] = true;
-                    this.zonaFinita[vipDisponible-1] = vehiculo;
+                    this.zonaFinita[vipDisponible-1].VehiculoEstacionado = vehiculo;
                     pudoEstacionar = true;
                 }
             }
@@ -211,8 +240,7 @@ namespace EstacionamientoCuantico
                 int sigDisponible = getSiguienteDisponible();
                 if (sigDisponible != -1)
                 {
-                    this.plazasFinitasOcupadas[sigDisponible] = true;
-                    this.zonaFinita[sigDisponible] = vehiculo;
+                    this.zonaFinita[sigDisponible].VehiculoEstacionado = vehiculo;
                     pudoEstacionar = true;
                 }
             }
@@ -222,9 +250,9 @@ namespace EstacionamientoCuantico
         {
             int plazaDisponible = -1;
             int indice = 0;
-            while (plazaDisponible == -1 && indice < plazasFinitasOcupadas.Length)
+            while (plazaDisponible == -1 && indice < zonaFinita.Length)
             {
-                if (!plazasVip.Contains(indice) && !plazasFinitasOcupadas[indice])// si no es vip y no está ocupada
+                if (!zonaFinita[indice].estaOcupada() && !zonaFinita[indice].esParaVip())// si no es vip y no está ocupada
                     plazaDisponible = indice;
                 indice++;
             }
@@ -234,9 +262,9 @@ namespace EstacionamientoCuantico
         {
             int plazaDisponible = -1;
             int indice = 0;
-            while (plazaDisponible == -1 && indice < plazasVip.Count) // mientras no haya una plaza disponible y hayan plazas por ver
+            while (plazaDisponible == -1 && indice < plazasVip.Length) // mientras no haya una plaza disponible y hayan plazas por ver
             {
-                if (!plazasFinitasOcupadas[ plazasVip[indice]-1 ]) // si la plaza finita vip no está ocupada
+                if (!zonaFinita[plazasVip[indice]-1].estaOcupada()) // si la plaza finita vip no está ocupada
                     plazaDisponible = plazasVip[indice]; // la guarda para ocupar
 
                 indice++;

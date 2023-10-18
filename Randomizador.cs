@@ -31,9 +31,9 @@ namespace EstacionamientoCuantico
             }
             return strRet;
         }
-        public static Estacionamiento RandEstacionamiento()
+        public static Estacionamiento RandEstacionamiento(int plazasFinitas, int[] plazasVip)
         {
-            Estacionamiento e = new Estacionamiento();
+            Estacionamiento e = new Estacionamiento(plazasFinitas, plazasVip);
             int iteraciones = rnd.Next(150);
             for (int i = 0; i < iteraciones; i++)
             {

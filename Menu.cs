@@ -100,9 +100,51 @@ namespace EstacionamientoCuantico
         // QUITAR VEHICULO POR DNI --------------------------------------------------------
         private void QuitarVehiculoDni()
         {
-            Console.WriteLine("Ingrese DNI del titular cuyo vehiculo desea desaparcar (primer ocurrencia)");
+            Console.WriteLine("Ingrese DNI del titular cuyo vehiculo/s desea desaparcar");
             string dni = Console.ReadLine();
-            ApertureParking.DesaparcarVehiculoDe(dni);
+            // listar vehiculo de cierto dni
+            List<Vehiculo> listaV = ApertureParking.getListadoVehiculosDe(dni);
+            if (listaV.Count > 0)
+            {
+                Console.WriteLine("Vehiculos encontrados:");
+                int indice = 0;
+                foreach (Vehiculo vo in listaV)
+                {
+                    Console.WriteLine((indice) + ": " + vo.ToString());
+                    indice++;
+                }
+                string seleccion = "";
+                while (!EsNumerico(seleccion))
+                {
+                    Console.WriteLine($"\nNro de vehiculo a desaparcar (o ingrese otro valor numerico para desaparcar todos)");
+                    seleccion = Console.ReadLine(); // mientras la rta no sea numerica sigue pidiendo valores
+                }
+                int selec = int.Parse(seleccion); // parsea
+                if (selec >= 0 && selec < indice) ApertureParking.DesaparcarVehiculo(listaV[selec].Matricula); // si la seleccion esta en el rango de vehiculos, lo elimina
+                else// sino, elimina todos
+                {
+                    foreach(Vehiculo vo in listaV)
+                    {
+                        ApertureParking.DesaparcarVehiculo(vo.Matricula);
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine($"La persona de dni {dni} no posee autos estacionados");
+            }
+            
+        }
+        private bool EsNumerico(string str)
+        {
+            bool es = false;
+            int indice = 0;
+            while (indice < str.Length)
+            {
+                if (str[indice] >= '0' && str[indice] <= '9') es = true;
+                indice++;
+            }
+            return es;
         }
         // QUITAR VEHICULOS RANDOM --------------------------------------------------------
         private void QuitarVehiculosRandom()
